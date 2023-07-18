@@ -1,13 +1,14 @@
-# W-13602369 - Signature US Only - 44739180 - State Farm Associate Contact Center - force:recordData not seeing record updates - recordUpdated event is not always being fired
-
+# W-13758089 - Microchip Technology Inc - force:recordData not seeing record updates - recordUpdated event is not fired for Non-Admin Users
 ## Repro
-1. Clone this repository
+1. Clone this repository branch
 2. Deploy to scratch org (might need to use --force-overwrite)
-3. Create a Case
-4. Make sure the Case is using the flexipage Single_Column
-5. On Case RH, change the Status field and save
-6. Note that the Aura component above the detail panel will not always update with the new status
+3. Create an Opportunity
+5. On Case RH, change the Stage field
+6. Note that the Aura component on the bottom right does not update the stage
 
-If you wait 30s it will update, so you have to refresh, and then change the status quickly.
+This has to do with the Probability field not being readable by the user.  FLS has restricted it.
 
-If you add the LWC component recordUpdatedLwc to the flexipage, then the problem goes away.
+So the field is requested by the lwcDetailPanel, and when LDS evaluates the aura component for possible emit, the Probability field is Pending.
+However, it never resolves since it is not visible on the layout.
+
+In 242 there are 2 getRecordWithFields requests for the detail panel, and the second one removes the field from the store.  This might be a ADG/Komaci issue.
